@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penghitung Pendapatan & Pengeluaran</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 400px; margin: auto; }
+        .expense-item { display: flex; gap: 10px; margin-top: 5px; }
+        .expense-item input { flex: 1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Penghitung Pendapatan & Pengeluaran</h2>
+        
+        <label for="name">Nama:</label>
+        <input type="text" id="name" placeholder="Masukkan nama">
+        
+        <label for="income">Pendapatan:</label>
+        <input type="text" id="income" placeholder="Masukkan pendapatan" oninput="formatNumber(this); formatAndCalculate();">
+        
+        <h3>Pengeluaran</h3>
+        <div id="expenses"></div>
+        <button onclick="addExpense()">Tambah Pengeluaran</button>
+        
+        <h3>Sisa Pendapatan: <span id="balance">Rp 0</span></h3>
+    </div>
+
+    <script>
+        function formatRupiah(angka) {
+            return 'Rp ' + angka.toLocaleString('id-ID');
+        }
+        
+        function formatNumber(input) {
+            let value = input.value.replace(/[^0-9]/g, '');
+            input.value = new Intl.NumberFormat('id-ID').format(value);
+        }
+        
+        function addExpense() {
+            const expenseDiv = document.createElement('div');
+            expenseDiv.classList.add('expense-item');
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = 'Nama Pengeluaran';
+            
+            const amountInput = document.createElement('input');
+            amountInput.type = 'text';
+            amountInput.placeholder = 'Nominal Pengeluaran';
+            amountInput.oninput = function() { formatNumber(this); formatAndCalculate(); };
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.textContent = 'Hapus';
+            removeBtn.onclick = function() {
+                expenseDiv.remove();
+                formatAndCalculate();
+            };
+            
+            expenseDiv.appendChild(input);
+            expenseDiv.appendChild(amountInput);
+            expenseDiv.appendChild(removeBtn);
+            document.getElementById('expenses').appendChild(expenseDiv);
+        }
+        
+        function formatAndCalculate() {
+            const incomeInput = document.getElementById('income').value.replace(/[^0-9]/g, '');
+            const income = parseFloat(incomeInput) || 0;
+            let totalExpenses = 0;
+            
+            document.querySelectorAll('#expenses input[type="text"]').forEach(input => {
+                if (input.placeholder === 'Nominal Pengeluaran') {
+                    totalExpenses += parseFloat(input.value.replace(/[^0-9]/g, '')) || 0;
+                }
+            });
+            
+            document.getElementById('balance').textContent = formatRupiah(income - totalExpenses);
+        }
+    </script>
+</body>
+</html>
